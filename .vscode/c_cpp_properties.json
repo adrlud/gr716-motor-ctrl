@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**"
+            ],
+            "defines": [],
+            "compilerPath": "/opt/bcc-2.0.8-rc.3-gdb8-gcc/bin/sparc-gaisler-elf-gcc",
+            "cStandard": "c11",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "/home/adrian/gr716-motor-ctrl/librv"
+                ]
+            }
+        }
+    ],
+    "version": 4
+}

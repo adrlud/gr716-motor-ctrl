@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "clkgate.h": "c",
+        "grgpio.h": "c"
+    }
+}
