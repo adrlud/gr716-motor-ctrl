@@ -1,5 +1,4 @@
-#include "../include/gr716_gpio.h"
-#include "../include/gr716_reg.h"
+#include "../include/gr716/gr716.h"
 
 uint32_t gr716_gpio_write(uint32_t pin, uint32_t value)
 {

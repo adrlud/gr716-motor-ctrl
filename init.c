@@ -1,5 +1,5 @@
-#include "include/gr716.h"
-#include "interrupt.h"
+#include "include/gr716/gr716.h"
+#include "include/bldc/interrupt.h"
 
 #include <stdio.h>
 

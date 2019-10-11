@@ -1,4 +1,4 @@
-#include "../include/gr716.h" 
+#include "../include/gr716/gr716.h"
 
 /* PWM Core control register */
 #define CEN_BIT   0     // PWM Core enable

@@ -1,4 +1,4 @@
-#include "include/gr716.h"
+#include "../gr716/gr716.h"
 
 #ifndef INTERRUPT_H
 #define INTERRUPT_H

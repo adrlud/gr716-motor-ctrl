@@ -1,4 +1,4 @@
-#include "../include/gr716.h" 
+#include "../include/gr716/gr716.h"
 
 int gr716_sram0_clock_enable(void) {
 
