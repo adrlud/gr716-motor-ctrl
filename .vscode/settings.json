@@ -6,6 +6,7 @@
         "interrupt.h": "c",
         "gr716.h": "c",
         "stdio.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "bcc.h": "c"
     }
 }

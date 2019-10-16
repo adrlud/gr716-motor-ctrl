@@ -33,7 +33,7 @@ int gr716_gpio_read(uint32_t pin);
 
 int gr716_gpio_find_irq_pin();
 
-uint32_t gr716_gpio_config(uint32_t pin, uint32_t direction, uint32_t mask, uint32_t polarity, uint32_t edge);
+uint32_t gr716_gpio_config(uint32_t pin, uint32_t direction, uint32_t mask, uint32_t polarity, uint32_t edge, uint32_t input);
 
 int gr716_gpio_toggle_edge(int pin);
 

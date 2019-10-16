@@ -1,54 +1,8 @@
-#include "include/gr716/gr716.h"
-#include "include/bldc/interrupt.h"
-
+#include <bldc/bldc.h>
+#include <gr716/gr716.h>
 #include <stdio.h>
 
 
-#define U_LOW 0
-#define U_HIGH 1
-#define V_LOW 2
-#define V_HIGH 3
-#define W_LOW 4 
-#define W_HIGH 5
-   
-
-unsigned int comm_state; // input from hall-sensors
-
-void commutate(){
-    printf("%d", comm_state);
-    switch(comm_state){
-        case 1:
-            gr716_pwm0_disable(W_HIGH);
-            gr716_pwm0_enable(U_HIGH);
-        break;
-        case 2:
-            gr716_pwm0_disable(V_LOW);
-            gr716_pwm0_enable(W_LOW);
-        break;
-        case 3:
-            gr716_pwm0_disable(U_HIGH);
-            gr716_pwm0_enable(V_HIGH);
-        break;
-        case 4:
-            gr716_pwm0_disable(W_LOW);
-            gr716_pwm0_enable(U_LOW);
-        break; 
-        case 5:
-            gr716_pwm0_disable(V_HIGH);
-            gr716_pwm0_enable(W_HIGH);
-        break;
-        case 6:
-            gr716_pwm0_disable(U_LOW);
-            gr716_pwm0_enable(V_LOW);
-            comm_state = 0;
-        break;
-        default:
-            for(int i = 0; i<6; i++)
-                gr716_pwm0_disable(i);
-        break;       
-    }
-    comm_state++;
-}
 
 
 /*PWM IO */
@@ -92,9 +46,93 @@ int pwm0_out_nbrs[] = {49, 51, 53, 55, 57, 59};
 
 
 
+#define U_LOW 0
+#define U_HIGH 1
+#define V_LOW 2
+#define V_HIGH 3
+#define W_LOW 4
+#define W_HIGH 5
+
+unsigned int comm_state;
+
+
+
+void commutate(){
+
+    //unsigned char hall = ((gr716_gpio_read(40)<<0) | (gr716_gpio_read(41)<<1) | (gr716_gpio_read(42)<<2));
+    
+    /*if(0){
+
+        switch (hall)
+            {
+            case (0b00000010):
+                comm_state = 1;
+                break;
+            case (0b00000011):
+                comm_state = 2;
+                break;
+            case (0b00000001):
+                comm_state = 3;
+                break;
+            case (0b00000101):
+                comm_state = 4;
+                break;
+            case (0b00000100):
+                comm_state = 5;
+                break;
+            case (0b00000110):
+                comm_state = 6;
+                break;
+            default:
+                //omm_state++;
+                break;
+            }
+
+    }*/
+   
+
+
+    switch(comm_state){
+
+        case 1:
+            gr716_pwm0_disable(W_HIGH);
+            gr716_pwm0_enable(U_HIGH);
+        break;
+        case 2:
+            gr716_pwm0_disable(V_LOW);
+            gr716_pwm0_enable(W_LOW);
+        break;
+        case 3:
+            gr716_pwm0_disable(U_HIGH);
+            gr716_pwm0_enable(V_HIGH);
+        break;
+        case 4:
+            gr716_pwm0_disable(W_LOW);
+            gr716_pwm0_enable(U_LOW);
+        break; 
+        case 5:
+            gr716_pwm0_disable(V_HIGH);
+            gr716_pwm0_enable(W_HIGH);
+        break;
+        case 6:
+            gr716_pwm0_disable(U_LOW);
+            gr716_pwm0_enable(V_LOW); 
+            comm_state = 0;
+        break;
+
+        default:
+            for(int i = 0; i<6; i++)
+                gr716_pwm0_disable(i);
+        break;       
+    }
+    comm_state++;
+}
+
+
+
 void PWM_init(){
     
-  
+
     /*Enable PWM clockgate*/
 
     if (gr716_pwm0_clk_enable() != 0){
@@ -111,7 +149,7 @@ void PWM_init(){
                         PWM0_IRQEN, PWM0_ISCALER, PWM0_PAIR, PWM0_POLARITY,
                         PWM0_FLIP, PWM0_DEADBAND, PWM0_DSCALER, 
                         PWM0_PERIOD,  
-                        PWM0_COMP1, PWM0_COMP2,   
+                        PWM3_COMP1, PWM0_COMP2,   
                         PWM0_DBCOMP);
     
     gr716_pwm0_config(  PWM1_NBR,
@@ -127,7 +165,7 @@ void PWM_init(){
                         PWM0_IRQEN, PWM0_ISCALER, PWM0_PAIR, PWM0_POLARITY,
                         PWM0_FLIP, PWM0_DEADBAND, PWM0_DSCALER, 
                         PWM0_PERIOD,  
-                        PWM0_COMP1, PWM0_COMP2,   
+                        PWM3_COMP1, PWM0_COMP2,   
                         PWM0_DBCOMP);
     
     gr716_pwm0_config(  PWM3_NBR,
@@ -135,7 +173,7 @@ void PWM_init(){
                         PWM0_IRQEN, PWM0_ISCALER, PWM0_PAIR, PWM0_POLARITY,
                         PWM0_FLIP, PWM0_DEADBAND, PWM0_DSCALER, 
                         PWM0_PERIOD,  
-                        PWM3_COMP1, PWM0_COMP2,   
+                        PWM0_COMP1, PWM0_COMP2,   
                         PWM0_DBCOMP);
     
     gr716_pwm0_config(  PWM4_NBR,
@@ -143,7 +181,7 @@ void PWM_init(){
                         PWM0_IRQEN, PWM0_ISCALER, PWM0_PAIR, PWM0_POLARITY,
                         PWM0_FLIP, PWM0_DEADBAND, PWM0_DSCALER, 
                         PWM0_PERIOD,  
-                        PWM3_COMP1, PWM0_COMP2,   
+                        PWM0_COMP1, PWM0_COMP2,   
                         PWM0_DBCOMP);
     
     gr716_pwm0_config(  PWM5_NBR,
@@ -151,57 +189,111 @@ void PWM_init(){
                         PWM0_IRQEN, PWM0_ISCALER, PWM0_PAIR, PWM0_POLARITY,
                         PWM0_FLIP, PWM0_DEADBAND, PWM0_DSCALER, 
                         PWM0_PERIOD,  
-                        PWM3_COMP1, PWM0_COMP2,   
+                        PWM0_COMP1, PWM0_COMP2,   
                         PWM0_DBCOMP);
     
     gr716_pwm0_global_enable(0);
-    commutate();
-    for(int i = 0; i < PWM_CHANNEL_COUNT; i++){
-        gr716_sleep_10ms(50000);        
-        commutate();
+    for(int i = 0; i<6; i++){
+
+        gr716_pwm0_enable(i);
+        gr716_sleep_10ms(10000);
+        gr716_pwm0_disable(i);
     }
+    gr716_pwm0_global_enable(0);
     
-    comm_state = 0;
-    commutate();
 }
 
 void GPIO_init(){
-    gr716_gpio_config(13,GPIO_DIR, GPIO_IRQ, GPIO_POL, GPIO_EDGE);
-    gr716_gpio_config(14,GPIO_DIR, GPIO_IRQ, GPIO_POL, GPIO_EDGE);
-    gr716_gpio_config(15,GPIO_DIR, GPIO_IRQ, GPIO_POL, GPIO_EDGE);
-    bcc_isr_register(17, interrupt_handler, NULL);
-    bcc_int_unmask(17);
-   
-  
-    int ret_gpio;
-    for(int i = 0; i < PWM_CHANNEL_COUNT; i++){
-        ret_gpio = gr716_pinfunc(pwm0_out_nbrs[i], IO_MODE_PWM);
-       // ret_gpio = gr716_pinmode(pwm0_out_nbrs[i], IO_MODE_OUTPUT, IO_MODE_PWM);
-    } 
 
+    //läs in hall sensorer för att ställa in polaritet på flank
+    int hall_a;
+    int hall_b;
+    int hall_c;
+
+    if (gr716_gpio_read(40))
+        hall_a = 0;
+    else
+        hall_a = 1;
+        
+    if (gr716_gpio_read(41))
+        hall_b = 0;
+    else
+        hall_b = 1;
+
+    if (gr716_gpio_read(42))
+        hall_c = 0;
+    else
+        hall_c = 1;
+
+
+
+    gr716_gpio_config(40,GPIO_DIR, GPIO_IRQ, hall_a, GPIO_EDGE,1);
+    gr716_gpio_config(41,GPIO_DIR, GPIO_IRQ, hall_b, GPIO_EDGE,1);
+    gr716_gpio_config(42,GPIO_DIR, GPIO_IRQ, hall_c, GPIO_EDGE,1);
+
+
+    
+    unsigned char hall = ((gr716_gpio_read(40)<<0) | (gr716_gpio_read(41)<<1) | (gr716_gpio_read(42)<<2));
+    
+    switch (hall)
+    {
+    case (0b00000010):
+        comm_state = 1;
+        break;
+    case (0b00000011):
+        comm_state = 2;
+        break;
+    case (0b00000001):
+        comm_state = 3;
+        break;
+    case (0b00000101):
+        comm_state = 4;
+        break;
+    case (0b00000100):
+        comm_state = 5;
+        break;
+    case (0b00000110):
+        comm_state = 6;
+        break;
+    default:
+        //comm_state++;
+        break;
+    }
+ 
+    bcc_int_map_set(38, 18); 
+    bcc_isr_register(18, interrupt_handler, NULL);
+    bcc_int_unmask(18);
+}
+
+void BLDC_init(){
+  int ret_gpio;
+    for(int i = 0; i < PWM_CHANNEL_COUNT; i++){
+       ret_gpio = gr716_pinfunc(pwm0_out_nbrs[i], IO_MODE_PWM);
+       ret_gpio = gr716_pinmode(pwm0_out_nbrs[i], IO_MODE_OUTPUT, IO_MODE_PWM);
+    }
+
+    commutate();
+    
 }
 
 
 int main(){
+    
+    
     PWM_init();
     GPIO_init();
+    BLDC_init();
     
-    /*  
-    commutate();
-
-    gr716_pwm0_global_enable(0);
-    for(int i = 0; i < PWM_CHANNEL_COUNT*20; i++){
-        gr716_sleep_10ms(100000);        
+    
+    for(int i = 0; i < 12; i++){
         commutate();
+        gr716_sleep_10ms(100000-(i*5000));
     }
-    */
-    comm_state = 1;
-    commutate();
-    gr716_sleep_10ms(100000); 
-    commutate();
     
-    
-    
+    while(1);
+   
+   
+  
     
   
 
