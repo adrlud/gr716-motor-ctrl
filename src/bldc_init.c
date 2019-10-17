@@ -1,6 +1,6 @@
 #include <bldc/bldc.h>
 #include <gr716/gr716.h>
-#include <stdio.h>
+#include <stdlib.h>
 
 
 
@@ -33,7 +33,7 @@ int pwm0_out_nbrs[] = {49, 51, 53, 55, 57, 59};
 #define PWM0_ISCALER       0                          // Set interrupt scaler scaler [0 - 7]
 #define PWM0_DSCALER       0                          // Set deadband scaler [0 - 7]
 #define PWM0_PERIOD        100 //0xffff                     // PWM period register [0 - 0xFFFF]
-#define PWM0_COMP1         0 //0x1fff                     // COMP1 dead band compare register [0 - 0xFFFF]
+#define PWM0_COMP1         80 //0x1fff                     // COMP1 dead band compare register [0 - 0xFFFF]
 #define PWM3_COMP1         0                           // comp1 low polarity = unmodulasted pwm 
 #define PWM0_COMP2         0x0                        // COMP2 dead band compare register [0 - 0xFFFF]
 #define PWM0_DBCOMP        0x0                        // PWM dead band compare register [0 - 0xFF]
@@ -57,41 +57,23 @@ unsigned int comm_state;
 
 
 
+void fnExit(void)
+{
+        gr716_pwm0_disable(0);
+        gr716_pwm0_disable(1);
+        gr716_pwm0_disable(2);
+        gr716_pwm0_disable(3);
+        gr716_pwm0_disable(4);
+        gr716_pwm0_disable(5);
+}
+
+
+ unsigned int last_time;
+
+
 void commutate(){
-
-    //unsigned char hall = ((gr716_gpio_read(40)<<0) | (gr716_gpio_read(41)<<1) | (gr716_gpio_read(42)<<2));
+    int time = bcc_timer_get_us();
     
-    /*if(0){
-
-        switch (hall)
-            {
-            case (0b00000010):
-                comm_state = 1;
-                break;
-            case (0b00000011):
-                comm_state = 2;
-                break;
-            case (0b00000001):
-                comm_state = 3;
-                break;
-            case (0b00000101):
-                comm_state = 4;
-                break;
-            case (0b00000100):
-                comm_state = 5;
-                break;
-            case (0b00000110):
-                comm_state = 6;
-                break;
-            default:
-                //omm_state++;
-                break;
-            }
-
-    }*/
-   
-
-
     switch(comm_state){
 
         case 1:
@@ -126,6 +108,14 @@ void commutate(){
         break;       
     }
     comm_state++;
+
+
+    int time_delta = time-last_time;
+    //printf("%d" ,time_delta);
+
+
+
+
 }
 
 
@@ -258,6 +248,7 @@ void GPIO_init(){
     default:
         //comm_state++;
         break;
+    
     }
  
     bcc_int_map_set(38, 18); 
@@ -283,11 +274,11 @@ int main(){
     PWM_init();
     GPIO_init();
     BLDC_init();
+    atexit(fnExit);
     
-    
-    for(int i = 0; i < 12; i++){
+    for(int i = 0; i < 6; i++){
         commutate();
-        gr716_sleep_10ms(100000-(i*5000));
+        gr716_sleep_10ms(100000-(i*10000));
     }
     
     while(1);

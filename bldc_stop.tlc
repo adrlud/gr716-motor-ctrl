@@ -1,0 +1,22 @@
+# Define hook procedures
+
+
+
+grmon::execsh eval {
+
+
+
+proc restart {} {
+        wmem 0x8000d018 0xa0a0a0a0 0x0000a0a0
+}
+
+proc stop {} { 
+    wmem 0x8000d018 0x00000000 0x00000000
+    
+}
+
+    
+lappend ::hooks::postexec ::stop ; # Add hooks
+
+}
+
