@@ -27,6 +27,7 @@
 #include "./gr716_mil1553.h"
 #include "./gr716_pwm.h"
 #include "./gr716_dma.h"
+#include "./gr716_irqts.h"
 
 #ifndef __GR716_H_
 #define __GR716_H_

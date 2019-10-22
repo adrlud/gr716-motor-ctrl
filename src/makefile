@@ -3,7 +3,7 @@ CC = $(PREFIX)gcc
 INCDIR=../include
 CFLAGS = -g -O3 -qbsp=gr716 -I$(INCDIR)
 DESTDIR = ../bin
-OBJS_RELATIVE= interrupt.o gr716_pwm.o gr716_gpio.o gr716_misc.o 
+OBJS_RELATIVE= interrupt.o gr716_pwm.o gr716_gpio.o gr716_misc.o gr716_irqts.o 
 OBJS= $(addprefix $(DESTDIR)/,$(OBJS_RELATIVE))
 
 all: main.elf
@@ -11,6 +11,8 @@ all: main.elf
 $(DESTDIR)/interrupt.o: bldc_interrupt.c $(INCDIR)/bldc/interrupt.h $(INCDIR)/gr716/gr716.h
 	$(CC) $(CFLAGS) -c bldc_interrupt.c -o $@
 
+$(DESTDIR)/gr716_irqts.o: gr716_irqts.c $(INCDIR)/gr716/gr716_irqts.h $(INCDIR)/gr716/gr716.h
+	$(CC) $(CFLAGS) -c gr716_irqts.c -o $@
 
 $(DESTDIR)/gr716_pwm.o: gr716_pwm.c $(INCDIR)/gr716/gr716_pwm.h $(INCDIR)/gr716/gr716.h
 	$(CC) $(CFLAGS) -c gr716_pwm.c -o $@

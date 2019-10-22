@@ -7,6 +7,7 @@
         "gr716.h": "c",
         "stdio.h": "c",
         "stdlib.h": "c",
-        "bcc.h": "c"
+        "bcc.h": "c",
+        "gr716_irqts.h": "c"
     }
 }

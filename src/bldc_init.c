@@ -2,7 +2,7 @@
 #include <gr716/gr716.h>
 #include <stdlib.h>
 
-
+const unsigned int __bsp_sysfreq = 50*1000*1000;
 
 
 /*PWM IO */
@@ -33,7 +33,7 @@ int pwm0_out_nbrs[] = {49, 51, 53, 55, 57, 59};
 #define PWM0_ISCALER       0                          // Set interrupt scaler scaler [0 - 7]
 #define PWM0_DSCALER       0                          // Set deadband scaler [0 - 7]
 #define PWM0_PERIOD        100 //0xffff                     // PWM period register [0 - 0xFFFF]
-#define PWM0_COMP1         80 //0x1fff                     // COMP1 dead band compare register [0 - 0xFFFF]
+#define PWM0_COMP1         0 //0x1fff                     // COMP1 dead band compare register [0 - 0xFFFF]
 #define PWM3_COMP1         0                           // comp1 low polarity = unmodulasted pwm 
 #define PWM0_COMP2         0x0                        // COMP2 dead band compare register [0 - 0xFFFF]
 #define PWM0_DBCOMP        0x0                        // PWM dead band compare register [0 - 0xFF]
@@ -276,10 +276,11 @@ int main(){
     BLDC_init();
     atexit(fnExit);
     
-    for(int i = 0; i < 6; i++){
+    for(int i = 0; i < 1; i++){
         commutate();
-        gr716_sleep_10ms(100000-(i*10000));
+        //gr716_sleep_10ms(100000-(i*10000));
     }
+    comm_state--;
     
     while(1);
    

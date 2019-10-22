@@ -6,17 +6,25 @@ grmon::execsh eval {
 
 
 
-proc restart {} {
-        wmem 0x8000d018 0xa0a0a0a0 0x0000a0a0
+
+proc timestamp {} {
+    set outfile [open "myfile.txt" a+]
+    set ts [mem 0x80002108 4] 
+    puts $outfile "$ts"
+    close $outfile
 }
 
 proc stop {} { 
+    
     wmem 0x8000d018 0x00000000 0x00000000
     
 }
 
+proc start {} { 
+    wmem 0x8000d018 0xa0a0a0a0 0x0000a0a0
+}
     
-lappend ::hooks::postexec ::stop ; # Add hooks
-
+lappend ::hooks::postexec ::stop; # Add hooks
+lappend ::hooks::preexec ::start ;
 }
 
