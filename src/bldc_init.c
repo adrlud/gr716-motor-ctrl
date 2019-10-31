@@ -1,8 +1,40 @@
 #include <bldc/bldc.h>
 #include <gr716/gr716.h>
 #include <stdlib.h>
+#include <bcc/bcc.h>
+#include <bcc/regs/apbuart.h>
+#include <bcc/bcc_param.h>
 
 const unsigned int __bsp_sysfreq = 50*1000*1000;
+
+
+uint32_t gr716_UART3_clk_enable(void)
+{
+
+  // Clock gate and IO configuration registers
+  struct gckcfg_apb {
+   volatile unsigned int  unlock;
+   volatile unsigned int  clocken;
+   volatile unsigned int  reset;
+   volatile unsigned int  override;
+  };
+
+  
+
+  // Pointers to clock gate block
+  struct  gckcfg_apb *gckcfgbase0 = (struct gckcfg_apb *) (GRCLKGATE0_BASE);
+    
+  gckcfgbase0->unlock  = REGSET(gckcfgbase0->unlock,  CG_UART3, CG_UNLOCK);
+  gckcfgbase0->clocken = REGSET(gckcfgbase0->clocken, CG_UART3, CG_ENABLE);
+  gckcfgbase0->reset   = REGSET(gckcfgbase0->reset ,  CG_UART3, CG_RELEASE);
+  gckcfgbase0->unlock  = REGSET(gckcfgbase0->unlock,  CG_UART3, CG_LOCK); 
+
+  return BCC_OK;
+
+        
+
+}
+
 
 
 /*PWM IO */
@@ -33,7 +65,7 @@ int pwm0_out_nbrs[] = {49, 51, 53, 55, 57, 59};
 #define PWM0_ISCALER       0                          // Set interrupt scaler scaler [0 - 7]
 #define PWM0_DSCALER       0                          // Set deadband scaler [0 - 7]
 #define PWM0_PERIOD        100 //0xffff                     // PWM period register [0 - 0xFFFF]
-#define PWM0_COMP1         0 //0x1fff                     // COMP1 dead band compare register [0 - 0xFFFF]
+#define PWM0_COMP1         50 //0x1fff                     // COMP1 dead band compare register [0 - 0xFFFF]
 #define PWM3_COMP1         0                           // comp1 low polarity = unmodulasted pwm 
 #define PWM0_COMP2         0x0                        // COMP2 dead band compare register [0 - 0xFFFF]
 #define PWM0_DBCOMP        0x0                        // PWM dead band compare register [0 - 0xFF]
@@ -54,52 +86,41 @@ int pwm0_out_nbrs[] = {49, 51, 53, 55, 57, 59};
 #define W_HIGH 5
 
 unsigned int comm_state;
-
-
-
-void fnExit(void)
-{
-        gr716_pwm0_disable(0);
-        gr716_pwm0_disable(1);
-        gr716_pwm0_disable(2);
-        gr716_pwm0_disable(3);
-        gr716_pwm0_disable(4);
-        gr716_pwm0_disable(5);
-}
-
-
- unsigned int last_time;
+unsigned int start_phases = 1;
 
 
 void commutate(){
-    int time = bcc_timer_get_us();
     
-    switch(comm_state){
+    unsigned char hall = ((gr716_gpio_read(40)<<0) | (gr716_gpio_read(41)<<1) | (gr716_gpio_read(42)<<2));
+    comm_state--;
 
-        case 1:
+    switch(hall){
+    
+        case 0b000000010:
             gr716_pwm0_disable(W_HIGH);
             gr716_pwm0_enable(U_HIGH);
+            comm_state = 7;
         break;
-        case 2:
-            gr716_pwm0_disable(V_LOW);
-            gr716_pwm0_enable(W_LOW);
+        case 0b00000011:
+            gr716_pwm0_enable(V_LOW);
+            gr716_pwm0_disable(U_LOW);
         break;
-        case 3:
-            gr716_pwm0_disable(U_HIGH);
-            gr716_pwm0_enable(V_HIGH);
-        break;
-        case 4:
-            gr716_pwm0_disable(W_LOW);
-            gr716_pwm0_enable(U_LOW);
-        break; 
-        case 5:
+        case 0b00000001:
             gr716_pwm0_disable(V_HIGH);
             gr716_pwm0_enable(W_HIGH);
         break;
-        case 6:
-            gr716_pwm0_disable(U_LOW);
-            gr716_pwm0_enable(V_LOW); 
-            comm_state = 0;
+        case 0b00000101:
+            gr716_pwm0_enable(U_LOW);
+            gr716_pwm0_disable(W_LOW);
+        break; 
+        case 0b00000100:
+            gr716_pwm0_disable(U_HIGH);
+            gr716_pwm0_enable(V_HIGH);
+            
+        break;
+        case 0b00000110:
+            gr716_pwm0_enable(W_LOW);
+            gr716_pwm0_disable(V_LOW);
         break;
 
         default:
@@ -107,17 +128,9 @@ void commutate(){
                 gr716_pwm0_disable(i);
         break;       
     }
-    comm_state++;
-
-
-    int time_delta = time-last_time;
-    //printf("%d" ,time_delta);
-
-
-
+    
 
 }
-
 
 
 void PWM_init(){
@@ -171,7 +184,7 @@ void PWM_init(){
                         PWM0_IRQEN, PWM0_ISCALER, PWM0_PAIR, PWM0_POLARITY,
                         PWM0_FLIP, PWM0_DEADBAND, PWM0_DSCALER, 
                         PWM0_PERIOD,  
-                        PWM0_COMP1, PWM0_COMP2,   
+                        PWM3_COMP1, PWM0_COMP2,   
                         PWM0_DBCOMP);
     
     gr716_pwm0_config(  PWM5_NBR,
@@ -199,6 +212,11 @@ void GPIO_init(){
     int hall_a;
     int hall_b;
     int hall_c;
+    gr716_gpio_config(40,GPIO_DIR, GPIO_IRQ, hall_a, GPIO_EDGE,1);
+    gr716_gpio_config(41,GPIO_DIR, GPIO_IRQ, hall_b, GPIO_EDGE,1);
+    gr716_gpio_config(42,GPIO_DIR, GPIO_IRQ, hall_c, GPIO_EDGE,1);
+
+
 
     if (gr716_gpio_read(40))
         hall_a = 0;
@@ -222,38 +240,12 @@ void GPIO_init(){
     gr716_gpio_config(42,GPIO_DIR, GPIO_IRQ, hall_c, GPIO_EDGE,1);
 
 
-    
-    unsigned char hall = ((gr716_gpio_read(40)<<0) | (gr716_gpio_read(41)<<1) | (gr716_gpio_read(42)<<2));
-    
-    switch (hall)
-    {
-    case (0b00000010):
-        comm_state = 1;
-        break;
-    case (0b00000011):
-        comm_state = 2;
-        break;
-    case (0b00000001):
-        comm_state = 3;
-        break;
-    case (0b00000101):
-        comm_state = 4;
-        break;
-    case (0b00000100):
-        comm_state = 5;
-        break;
-    case (0b00000110):
-        comm_state = 6;
-        break;
-    default:
-        //comm_state++;
-        break;
-    
-    }
- 
     bcc_int_map_set(38, 18); 
     bcc_isr_register(18, interrupt_handler, NULL);
     bcc_int_unmask(18);
+    
+   
+    
 }
 
 void BLDC_init(){
@@ -263,24 +255,68 @@ void BLDC_init(){
        ret_gpio = gr716_pinmode(pwm0_out_nbrs[i], IO_MODE_OUTPUT, IO_MODE_PWM);
     }
 
-    commutate();
+
+
+     unsigned char hall = ((gr716_gpio_read(40)<<0) | (gr716_gpio_read(41)<<1) | (gr716_gpio_read(42)<<2));
+    printf("%d", hall);
     
+    switch (hall)
+    {
+    case (0b000000010):
+        comm_state = 1;
+        gr716_pwm0_enable(V_LOW); 
+        gr716_pwm0_enable(U_HIGH);
+        break;
+    case (0b00000011):
+        comm_state = 2;
+        gr716_pwm0_enable(W_HIGH);
+        gr716_pwm0_enable(V_LOW);
+        break;
+    case (0b00000001):
+        comm_state = 3;
+        gr716_pwm0_enable(U_LOW);
+        gr716_pwm0_enable(W_HIGH);
+        break;
+    case (0b00000101):
+        comm_state = 4;
+        gr716_pwm0_enable(V_HIGH);
+        gr716_pwm0_enable(U_LOW);
+        break;
+    case (0b00000100):
+        comm_state = 5;
+        gr716_pwm0_enable(V_HIGH);
+        gr716_pwm0_enable(W_LOW);
+        break;
+    case (0b00000110):
+        comm_state = 6;
+        gr716_pwm0_enable(U_HIGH);
+        gr716_pwm0_enable(W_LOW);
+        break;
+    default:
+        //comm_state++;
+        
+        break;
+    
+    }
+
 }
 
 
 int main(){
-    
-    
+    gr716_int_timestamp_config(18);
     PWM_init();
+    
+    
+    
     GPIO_init();
     BLDC_init();
-    atexit(fnExit);
-    
-    for(int i = 0; i < 1; i++){
-        commutate();
-        //gr716_sleep_10ms(100000-(i*10000));
+    gr716_int_timestamp_config(18);
+
+    for(int i = 0; i < 4; i++){
+        
+     //   gr716_sleep_10ms(10000);
     }
-    comm_state--;
+  
     
     while(1);
    

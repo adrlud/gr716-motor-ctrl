@@ -90,13 +90,13 @@ uint32_t gr716_gpio_config(uint32_t pin, uint32_t direction, uint32_t mask, uint
           gpiobase0->irq_mask        = REGSETIOMODE(gpiobase0->irq_mask, (pin % 32),mask);
           gpiobase0->polarity        = REGSETIOMODE(gpiobase0->polarity, (pin % 32),polarity);
           gpiobase0->edge            = REGSETIOMODE(gpiobase0->edge, (pin % 32),edge);
-          gpiobase0->input_enable    = REGSETIOMODE(gpiobase0->input_enable, (pin % 32),edge);
+          gpiobase0->input_enable    = REGSETIOMODE(gpiobase0->input_enable, (pin % 32), input);
        } else {
           gpiobase1->direction       = REGSETIOMODE(gpiobase1->direction, (pin % 32),direction);
           gpiobase1->irq_mask        = REGSETIOMODE(gpiobase1->irq_mask, (pin % 32),mask);
           gpiobase1->polarity        = REGSETIOMODE(gpiobase1->polarity, (pin % 32),polarity);
           gpiobase1->edge            = REGSETIOMODE(gpiobase1->edge, (pin % 32),edge);
-          gpiobase1->input_enable    = REGSETIOMODE(gpiobase1->input_enable, (pin % 32),edge);
+          gpiobase1->input_enable    = REGSETIOMODE(gpiobase1->input_enable, (pin % 32),input);
        }
     
        return BCC_OK;
