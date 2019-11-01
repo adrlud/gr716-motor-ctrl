@@ -3,11 +3,11 @@
 
 
 int duty;
-
+int dutyChanged;
 int main(){
     BLDC_start_motor();
     while (1){
-        int dutyChanged;
+      
         if (dutyChanged != duty){
             dutyChanged = duty;
             gr716_pwm0_comp_update( 1, duty, 0);
