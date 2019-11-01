@@ -10,7 +10,7 @@
  *  6. gr716_pwm0_comp_update     - Update PWM0 Compare values
  *  7. gr716_pwm0_disable         - Disable PWM0
  *  8. gr716_pwm0_global_enable   - Global PWM0 enbale
- *  9. gr716_pwm0_global_disable  - Global PWM1 disable
+ *  9. gr716_pwm0_global_disable  - Global PWMo disable
  * 
 */
 
