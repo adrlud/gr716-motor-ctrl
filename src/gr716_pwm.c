@@ -155,7 +155,7 @@ uint32_t gr716_pwm0_comp_update(uint32_t nbr, uint32_t comp1, uint32_t comp2)
 {
 
   /* PWM Unit: a bit ugly but does the job */
-volatile struct grpwm_apb *pwmbase0 = (struct grpwm_apb *) (GRPWM0_BASE + (nbr * 0x10));
+  volatile struct grpwm_apb *pwmbase0 = (struct grpwm_apb *) (GRPWM0_BASE + (nbr * 0x10));
   
     pwmbase0->pcomp0   = REGSET(pwmbase0->pcomp0,   COMP1,   comp1);
     pwmbase0->pcomp0   = REGSET(pwmbase0->pcomp0,   COMP2,   comp2);

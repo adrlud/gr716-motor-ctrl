@@ -5,41 +5,10 @@
 #include <bcc/regs/apbuart.h>
 #include <bcc/bcc_param.h>
 
+
+/*system clock 5 Mhz*/
 const unsigned int __bsp_sysfreq = 50*1000*1000;
 
-
-uint32_t gr716_UART3_clk_enable(void)
-{
-
-  // Clock gate and IO configuration registers
-  struct gckcfg_apb {
-   volatile unsigned int  unlock;
-   volatile unsigned int  clocken;
-   volatile unsigned int  reset;
-   volatile unsigned int  override;
-  };
-
-  
-
-  // Pointers to clock gate block
-  struct  gckcfg_apb *gckcfgbase0 = (struct gckcfg_apb *) (GRCLKGATE0_BASE);
-    
-  gckcfgbase0->unlock  = REGSET(gckcfgbase0->unlock,  CG_UART3, CG_UNLOCK);
-  gckcfgbase0->clocken = REGSET(gckcfgbase0->clocken, CG_UART3, CG_ENABLE);
-  gckcfgbase0->reset   = REGSET(gckcfgbase0->reset ,  CG_UART3, CG_RELEASE);
-  gckcfgbase0->unlock  = REGSET(gckcfgbase0->unlock,  CG_UART3, CG_LOCK); 
-
-  return BCC_OK;
-
-        
-
-}
-
-
-
-/*PWM IO */
-
-int pwm0_out_nbrs[] = {49, 51, 53, 55, 57, 59};
 /*Global config*/
 #define PWM0_GSCALER 0x31
 
@@ -64,88 +33,31 @@ int pwm0_out_nbrs[] = {49, 51, 53, 55, 57, 59};
 #define PWM0_SCALER        0                          // Set clock scaler scaler [0 - 7]
 #define PWM0_ISCALER       0                          // Set interrupt scaler scaler [0 - 7]
 #define PWM0_DSCALER       0                          // Set deadband scaler [0 - 7]
-#define PWM0_PERIOD        100 //0xffff                     // PWM period register [0 - 0xFFFF]
-#define PWM0_COMP1         50 //0x1fff                     // COMP1 dead band compare register [0 - 0xFFFF]
+#define PWM0_PERIOD        100                         // PWM period register [0 - 0xFFFF]
+#define PWM0_COMP1         0                         // COMP1 dead band compare register [0 - 0xFFFF]
 #define PWM3_COMP1         0                           // comp1 low polarity = unmodulasted pwm 
 #define PWM0_COMP2         0x0                        // COMP2 dead band compare register [0 - 0xFFFF]
 #define PWM0_DBCOMP        0x0                        // PWM dead band compare register [0 - 0xFF]
 
-/* GPIO config*/
-#define GPIO_DIR 0x0
-#define GPIO_IRQ 0x1
-#define GPIO_POL 0x0
-#define GPIO_EDGE 0x1 
 
 
 
-#define U_LOW 0
-#define U_HIGH 1
-#define V_LOW 2
-#define V_HIGH 3
-#define W_LOW 4
-#define W_HIGH 5
-
-unsigned int comm_state;
-unsigned int start_phases = 1;
+ 
 
 
-void commutate(){
-    
-    unsigned char hall = ((gr716_gpio_read(40)<<0) | (gr716_gpio_read(41)<<1) | (gr716_gpio_read(42)<<2));
-    comm_state--;
-
-    switch(hall){
-    
-        case 0b000000010:
-            gr716_pwm0_disable(W_HIGH);
-            gr716_pwm0_enable(U_HIGH);
-            comm_state = 7;
-        break;
-        case 0b00000011:
-            gr716_pwm0_enable(V_LOW);
-            gr716_pwm0_disable(U_LOW);
-        break;
-        case 0b00000001:
-            gr716_pwm0_disable(V_HIGH);
-            gr716_pwm0_enable(W_HIGH);
-        break;
-        case 0b00000101:
-            gr716_pwm0_enable(U_LOW);
-            gr716_pwm0_disable(W_LOW);
-        break; 
-        case 0b00000100:
-            gr716_pwm0_disable(U_HIGH);
-            gr716_pwm0_enable(V_HIGH);
-            
-        break;
-        case 0b00000110:
-            gr716_pwm0_enable(W_LOW);
-            gr716_pwm0_disable(V_LOW);
-        break;
-
-        default:
-            for(int i = 0; i<6; i++)
-                gr716_pwm0_disable(i);
-        break;       
-    }
-    
-
-}
 
 
 void PWM_init(){
-    
-
     /*Enable PWM clockgate*/
 
     if (gr716_pwm0_clk_enable() != 0){
-        printf("Failed to enable pwm0 clockgate");
         return;
     }
     
     
     /*Setup PWM generator*/
     gr716_pwm0_init(PWM0_GSCALER);
+    
     /*Setup each PWM channel*/
      gr716_pwm0_config( PWM0_NBR,
                         PWM0_MODE, PWM0_METH, PWM0_TRIGGER, PWM0_SCALER, 
@@ -195,6 +107,7 @@ void PWM_init(){
                         PWM0_COMP1, PWM0_COMP2,   
                         PWM0_DBCOMP);
     
+    /*Make sure all pwm are reset with the new conigurations*/
     gr716_pwm0_global_enable(0);
     for(int i = 0; i<6; i++){
 
@@ -207,123 +120,113 @@ void PWM_init(){
 }
 
 void GPIO_init(){
+    /* Setup polarity on edge interrupt according to current state of hall to enable interrupt on change from the get go */
+    /*The GPIO doesnt support interrupt on both rising and falling edge at the same time*/
+    /* this function sets intterupt on each pin to either rising or falling edge acoording to the current state*/
 
-    //läs in hall sensorer för att ställa in polaritet på flank
+
+    /*Configure hall sensors input pins to make them readable*/
+    gr716_gpio_config(HALL_A, GPIO_DIR, GPIO_IRQ, GPIO_POL, GPIO_EDGE, GPIO_INPUT_ENABLE);
+    gr716_gpio_config(HALL_B, GPIO_DIR, GPIO_IRQ, GPIO_POL, GPIO_EDGE, GPIO_INPUT_ENABLE);
+    gr716_gpio_config(HALL_C, GPIO_DIR, GPIO_IRQ, GPIO_POL, GPIO_EDGE, GPIO_INPUT_ENABLE);
+
     int hall_a;
     int hall_b;
     int hall_c;
-    gr716_gpio_config(40,GPIO_DIR, GPIO_IRQ, hall_a, GPIO_EDGE,1);
-    gr716_gpio_config(41,GPIO_DIR, GPIO_IRQ, hall_b, GPIO_EDGE,1);
-    gr716_gpio_config(42,GPIO_DIR, GPIO_IRQ, hall_c, GPIO_EDGE,1);
 
-
-
-    if (gr716_gpio_read(40))
-        hall_a = 0;
+    /*Read hall sensors input*/
+    if (gr716_gpio_read(HALL_A)) 
+        hall_a = GPIO_FALLING;        /* If hall sensor is high, set interrupt to trigger on falling edge*/
     else
-        hall_a = 1;
+        hall_a = GPIO_RISING;         /* If hall sensor is low, set interrupt to trigger on rising edge*/
         
-    if (gr716_gpio_read(41))
-        hall_b = 0;
+    if (gr716_gpio_read(HALL_B))
+        hall_b = GPIO_FALLING;
     else
-        hall_b = 1;
+        hall_b = GPIO_RISING;
 
-    if (gr716_gpio_read(42))
-        hall_c = 0;
+    if (gr716_gpio_read(HALL_C))
+        hall_c = GPIO_FALLING;
     else
-        hall_c = 1;
+        hall_c = GPIO_RISING;
+
+    /*Configure interrupt polarity again with the new values to the polarity bits*/
+    gr716_gpio_config(HALL_A, GPIO_DIR, GPIO_IRQ, hall_a, GPIO_EDGE, GPIO_INPUT_ENABLE);
+    gr716_gpio_config(HALL_B, GPIO_DIR, GPIO_IRQ, hall_b, GPIO_EDGE, GPIO_INPUT_ENABLE);
+    gr716_gpio_config(HALL_C, GPIO_DIR, GPIO_IRQ, hall_c, GPIO_EDGE, GPIO_INPUT_ENABLE);
 
 
+}
 
-    gr716_gpio_config(40,GPIO_DIR, GPIO_IRQ, hall_a, GPIO_EDGE,1);
-    gr716_gpio_config(41,GPIO_DIR, GPIO_IRQ, hall_b, GPIO_EDGE,1);
-    gr716_gpio_config(42,GPIO_DIR, GPIO_IRQ, hall_c, GPIO_EDGE,1);
-
-
-    bcc_int_map_set(38, 18); 
+void interrupt_init(){
+    /*Remap gpio1 intterrupt vector*/
+    bcc_int_map_set(38, 18);
     bcc_isr_register(18, interrupt_handler, NULL);
     bcc_int_unmask(18);
-    
-   
-    
 }
 
 void BLDC_init(){
-  int ret_gpio;
+    
+    /*PWM IO */
+    /* pwm out nbrs shall contain the pwm output pins numbers*/
+    int pwm0_out_nbrs[] = {49, 51, 53, 55, 57, 59};
+    /*Set IO mux to PWM */
     for(int i = 0; i < PWM_CHANNEL_COUNT; i++){
-       ret_gpio = gr716_pinfunc(pwm0_out_nbrs[i], IO_MODE_PWM);
-       ret_gpio = gr716_pinmode(pwm0_out_nbrs[i], IO_MODE_OUTPUT, IO_MODE_PWM);
+       gr716_pinfunc(pwm0_out_nbrs[i], IO_MODE_PWM); /* pwm out nbrs shall contain the pwm output pins */
+       gr716_pinmode(pwm0_out_nbrs[i], IO_MODE_OUTPUT, IO_MODE_PWM);
     }
 
-
-
-     unsigned char hall = ((gr716_gpio_read(40)<<0) | (gr716_gpio_read(41)<<1) | (gr716_gpio_read(42)<<2));
-    printf("%d", hall);
+    /* Read hall-sensors into one word*/
+    unsigned char hall = ((gr716_gpio_read(40)<<0) | (gr716_gpio_read(41)<<1) | (gr716_gpio_read(42)<<2));
     
+    /*Enable pwm accordingly to the phase*/
     switch (hall)
     {
     case (0b000000010):
-        comm_state = 1;
+        //comm_state = 1;
         gr716_pwm0_enable(V_LOW); 
         gr716_pwm0_enable(U_HIGH);
         break;
     case (0b00000011):
-        comm_state = 2;
+        //comm_state = 2;
         gr716_pwm0_enable(W_HIGH);
         gr716_pwm0_enable(V_LOW);
         break;
     case (0b00000001):
-        comm_state = 3;
+        //comm_state = 3;
         gr716_pwm0_enable(U_LOW);
         gr716_pwm0_enable(W_HIGH);
         break;
     case (0b00000101):
-        comm_state = 4;
+        //comm_state = 4;
         gr716_pwm0_enable(V_HIGH);
         gr716_pwm0_enable(U_LOW);
         break;
     case (0b00000100):
-        comm_state = 5;
+       // comm_state = 5;
         gr716_pwm0_enable(V_HIGH);
         gr716_pwm0_enable(W_LOW);
         break;
     case (0b00000110):
-        comm_state = 6;
+       // comm_state = 6;
         gr716_pwm0_enable(U_HIGH);
         gr716_pwm0_enable(W_LOW);
         break;
     default:
-        //comm_state++;
-        
         break;
     
     }
 
 }
 
-
-int main(){
+void BLDC_start_motor(){
     gr716_int_timestamp_config(18);
     PWM_init();
-    
-    
-    
     GPIO_init();
+    interrupt_init();
     BLDC_init();
     gr716_int_timestamp_config(18);
-
-    for(int i = 0; i < 4; i++){
-        
-     //   gr716_sleep_10ms(10000);
-    }
-  
-    
-    while(1);
-   
-   
-  
-    
-  
-
-
 }
+
+    
+  

@@ -28,7 +28,7 @@
 #include "./gr716_mil1553.h"
 #include "./gr716_pwm.h"
 #include "./gr716_dma.h"
-#include "./gr716_irqts.h"
+#include "./gr716_timestamp.h"
 #include "./gr716_clock_gate.h"
 
 

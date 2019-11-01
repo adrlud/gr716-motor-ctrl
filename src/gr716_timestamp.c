@@ -1,4 +1,4 @@
-#include <gr716/gr716_irqts.h>
+#include <gr716/gr716_timestamp.h>
 
 
 int gr716_int_timestamp_config(uint32_t interrupt_line){

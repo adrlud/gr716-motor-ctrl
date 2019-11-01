@@ -66,7 +66,7 @@
 #define PAIRZ_MASK      0x1
 #define DCEN_BIT        8      // Dual compare mode enable
 #define DCEN_MASK       0x1
-#define WEN_BIT         9      // Waveform PWM enable (Shall be removed!)
+#define WEN_BIT         9      // Waveform PWM enable 
 #define WEN_MASK        0x1
 #define SCALERSEL_BIT   10     //  Scaler select bits
 #define SCALERSEL_MASK  0x7
@@ -96,9 +96,9 @@ struct grpwm_apb {
    volatile unsigned int  ipend;
    volatile unsigned int  cap1;
    volatile unsigned int  cap2;
-   volatile unsigned int  wave;     // Not used for GR716!
-   volatile unsigned int  r0;       // Not used for GR716!
-   volatile unsigned int  r1;       // Not used for GR716!
+   volatile unsigned int  wave;    
+   volatile unsigned int  r0;      
+   volatile unsigned int  r1;      
    volatile unsigned int  period0;
    volatile unsigned int  pcomp0;
    volatile unsigned int  pdead0;
@@ -145,7 +145,7 @@ struct grpwm_apb {
  * comp2         : COMP2 dead band compare register
  * dbcomp        : PWM dead band compare register
  *
- * return: BCC response
+ * 
  * 
  * Modes: 
  * 
@@ -181,9 +181,6 @@ struct grpwm_apb {
 
 /*
  * PWM0 config
- *
- *
- * return: OK
  * 
  */
 
@@ -197,9 +194,6 @@ uint32_t gr716_pwm0_config(uint32_t nbr,
 
 /*
  * PWM0 Update
- *
- *
- * return: OK
  * 
  */
 
@@ -207,9 +201,6 @@ uint32_t gr716_pwm0_comp_update(uint32_t nbr, uint32_t comp1, uint32_t comp2);
 
 /*
  * PWM0 Init
- *
- *
- * return: OK
  * 
  */
 
@@ -217,9 +208,6 @@ uint32_t gr716_pwm0_init(uint32_t scaler);
 
 /*
  * PWM0 global enable
- *
- *
- * return: OK
  * 
  */
 
@@ -227,9 +215,6 @@ uint32_t gr716_pwm0_global_disable(uint32_t mask);
 
 /*
  * PWM0 global disable
- *
- *
- * return: OK
  * 
  */
 
@@ -237,9 +222,6 @@ uint32_t gr716_pwm0_global_enable(uint32_t mask);
 
 /*
  * PWM0 enable
- *
- *
- * return: OK
  * 
  */
 
@@ -247,9 +229,6 @@ uint32_t gr716_pwm0_enable(uint32_t nbr);
 
 /*
  * PWM0 disable
- *
- *
- * return: OK
  * 
  */
 
@@ -257,9 +236,6 @@ uint32_t gr716_pwm0_disable(uint32_t nbr);
 
 /*
  * PWM0 Clock enable
- *
- *
- * return: OK
  * 
  */
 
@@ -267,9 +243,6 @@ uint32_t gr716_pwm0_clk_enable(void);
 
 /*
  * PWM0 clock disable
- *
- *
- * return: BCC response
  * 
  */
 
