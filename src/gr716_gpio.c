@@ -11,21 +11,16 @@ uint32_t gr716_gpio_write(uint32_t pin, uint32_t value)
        return BCC_FAIL;
     } else {
        if (pin < 32) {
-          gpiobase0->output       = REGSETIOMODE(gpiobase0->output, (pin % 32),value);
+          gpiobase0->output = REGSETIOMODE(gpiobase0->output, (pin % 32),value);
        } else {
-          gpiobase1->output       = REGSETIOMODE(gpiobase1->output, (pin % 32),value);
+          gpiobase1->output = REGSETIOMODE(gpiobase1->output, (pin % 32),value);
        }
     
        return BCC_OK;
     }   
 }
 
-int gr716_gpio_read(uint32_t pin)
-{
-
-
-      
-
+uint32_t gr716_gpio_read(uint32_t pin){
    struct grgpio_apb *gpiobase0 = (struct grgpio_apb *) GPIO0_BASE;
    struct grgpio_apb *gpiobase1 = (struct grgpio_apb *) GPIO1_BASE;
 
@@ -43,26 +38,8 @@ int gr716_gpio_read(uint32_t pin)
     }   
 }
 
-/* Adrians funktion */
 
-uint32_t gr716_gpio_config(uint32_t pin, uint32_t direction, uint32_t mask, uint32_t polarity, uint32_t edge, uint32_t input)
-{
-   struct grgpio_apb {
-   volatile unsigned int  data;         // 0x00       I/O Port Data Register
-   volatile unsigned int  output;       // 0x04       I/O Port Output Register
-   volatile unsigned int  direction;    // 0x08       I/O Port Direction Register 
-   volatile unsigned int  irq_mask;         // 0x0C       I/O Port interrupt mask Register
-   volatile unsigned int  polarity;
-   volatile unsigned int  edge;            // 0x0C       I/O Port interrupt mask Register
-   volatile unsigned int  capability;
-   volatile unsigned int  irq_map[7];
-   volatile unsigned int  irq_avalible;
-   volatile unsigned int  irq_flag;
-   volatile unsigned int  input_enable;
-   };
-      
-      
-
+uint32_t gr716_gpio_config(uint32_t pin, uint32_t direction, uint32_t mask, uint32_t polarity, uint32_t edge, uint32_t input){
    struct grgpio_apb *gpiobase0 = (struct grgpio_apb *) GPIO0_BASE;
    struct grgpio_apb *gpiobase1 = (struct grgpio_apb *) GPIO1_BASE;
 
@@ -88,40 +65,31 @@ uint32_t gr716_gpio_config(uint32_t pin, uint32_t direction, uint32_t mask, uint
        return BCC_OK;
     }   
 }
-/* Funktinen hittar vilken gpio pinne som har orsakat ett interrrupt */
- int gr716_gpio_find_irq_pin()
-{
-
-   volatile unsigned int * iflag = (volatile int*) 0x8030D044;
+/* Find pin who caused uint32_terrupt*/
+ uint32_t gr716_gpio_find_irq_pin(){
+                                                       /*Raw pinter to interrupt*/          
+   volatile uint32_t * iflag = (volatile uint32_t*) 0x8030D044; 
    for(int i = 0; i < 32; i++){
-
+      //if uint32_terrupt bit = 1 the pin caused interrupt 
       if (*iflag & (1 << i)){
-         //clear interrupt flag
-         *iflag = REGSETIOMODE(*iflag, i, 1);
-         return i+32;
+         //clear uint32_terrupt flag
+         *iflag = REGSETIOMODE(*iflag, i, 1); /* bit is cleared by writing 1 to it, write of 0 have no effect */
+         return i+32; /* This is becouse GPIO1 (pin 32-63) is used, delete +32 for use with GPIO0 
+                       * GPIO0 is not initilized in this program
+                       * The state of GPIO0 uint32_terrupt flag register is unknown                       
+                       */
       }
    } 
    return BCC_FAIL;
 }
+/*
+ * 
+ * This function change polarity for the edge uint32_tterupt.
+ * i.e the gpio request an uint32_terrupt on either low to high flank or high to low flank.
+ * If interrupt on both flanks is wanated, call this function after an uint32_terrupt to change flank. 
+ */ 
 
-int gr716_gpio_toggle_edge(int pin){
-   
-   struct grgpio_apb {
-   volatile unsigned int  data;         // 0x00       I/O Port Data Register
-   volatile unsigned int  output;       // 0x04       I/O Port Output Register
-   volatile unsigned int  direction;    // 0x08       I/O Port Direction Register 
-   volatile unsigned int  irq_mask;         // 0x0C       I/O Port interrupt mask Register
-   volatile unsigned int  polarity;
-   volatile unsigned int  edge;            // 0x0C       I/O Port interrupt mask Register
-   volatile unsigned int  capability;
-   volatile unsigned int  irq_map[7];
-   volatile unsigned int  irq_avalible;
-   volatile unsigned int  irq_flag;
-   volatile unsigned int  input_enable;
-   };
-      
-      
-
+uint32_t gr716_gpio_toggle_edge(uint32_t pin){
    struct grgpio_apb *gpiobase0 = (struct grgpio_apb *) GPIO0_BASE;
    struct grgpio_apb *gpiobase1 = (struct grgpio_apb *) GPIO1_BASE;
    
@@ -135,7 +103,6 @@ int gr716_gpio_toggle_edge(int pin){
       }else {
          gpiobase1->polarity ^= (1 << pin%32);
       }
-       
    } 
    return BCC_OK;
 

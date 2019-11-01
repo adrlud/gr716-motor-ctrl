@@ -270,7 +270,7 @@ static uint32_t gr716_pwm0clk(uint32_t source, uint32_t div, uint32_t duty, uint
       volatile unsigned int  pwm1_ref;
    };
 
-    volatile struct  pll_apb *pll_base = (struct pll_apb *) (PLL_BASE);
+    volatile struct pll_apb *pll_base = (struct pll_apb *) (PLL_BASE);
 
     if (source < PWMCLK_SOURCE_CLK) {
        return BCC_FAIL;
