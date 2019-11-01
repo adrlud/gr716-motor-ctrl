@@ -10,6 +10,8 @@ uint32_t counter;
 
 
 void interrupt_handler(void *ptr, int nbr){
+    /* TODO: handle interrupt from timer also */
+    
     commutate();
     int pin = gr716_gpio_find_irq_pin();
     

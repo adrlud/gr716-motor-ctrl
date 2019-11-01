@@ -210,6 +210,16 @@ void BLDC_init(){
 
 }
 
+void ADC_init(){
+    /* TODO: Initilize for zero crossing detection */
+}
+
+void TIMER_init(){
+    /* TODO: initilize for sending an irq after half of a phase time */
+}
+
+
+
 void BLDC_start_motor(){
     gr716_int_timestamp_config(18);
     PWM_init();
