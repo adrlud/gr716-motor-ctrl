@@ -34,16 +34,6 @@ int gr716_spi0_slave_select(uint32_t mask)
 
 int gr716_spi0_automatic_slave_select(uint32_t mask)
 {
-
-  #define SPI_ASEL_BIT      14
-  #define SPI_ASEL_MASK     0x1
-  #define SPI_ASELDEL_BIT   5
-  #define SPI_ASELDEL_MASK  0x1
-  #define SPI_IGSEL_BIT     2
-  #define SPI_IGSEL_MASK    0x1
-
-
-
   // Pointers to Clock gate and IO configuration registers
   struct  spictrl_apb *spictrlbase0 = (struct spictrl_apb *) (SPICTRL0_BASE);
 

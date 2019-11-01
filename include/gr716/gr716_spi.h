@@ -23,8 +23,9 @@
 #define SPI_IGSEL_BIT     2
 #define SPI_IGSEL_MASK    0x1
 
+
   // Clock gate and IO configuration registers
-  struct spictrl_apb {
+struct spictrl_apb {
     volatile unsigned int  cap0;
     volatile unsigned int  unused4;
     volatile unsigned int  unused8;
@@ -41,12 +42,10 @@
     volatile unsigned int  rx;
     volatile unsigned int  slvsel;
     volatile unsigned int  aslvsel;
-  };
+};
 
 /*
  * Enable clock for SPI control unit 0
- *
- * return: ok
  * 
  */
 
@@ -54,8 +53,6 @@ int gr716_spi0_clock_enable(void);
 
 /*
  * Set slave select for SPI control unit 0
- *
- * return: ok
  * 
  */
 
@@ -63,8 +60,6 @@ int gr716_spi0_slave_select(uint32_t mask);
 
 /*
  * Set Auto slave select for SPI control unit 0
- *
- * return: ok
  * 
  */
 
@@ -72,16 +67,13 @@ int gr716_spi0_automatic_slave_select(uint32_t mask);
 
 /*
  * Wait for TIP low
- *
- * return: ok
+
  * 
  */
 
 int gr716_wait_for_tip_low(void);
 /*
  * Wait for TIP high
- *
- * return: ok
  * 
  */
 
@@ -90,8 +82,6 @@ int gr716_wait_for_tip_high(void);
 
 /*
  * Ignore SPISEL input( Mainly when acting as master)
- *
- * return: 0
  * 
  */
 int gr716_spi0_ignore_spi_select();

@@ -3,7 +3,7 @@ CC = $(PREFIX)gcc
 INCDIR=../include
 CFLAGS = -g -O3 -qbsp=gr716 -I$(INCDIR)
 DESTDIR = ../bin
-OBJS_RELATIVE= bldc_commutate.o bldc_init.o bldc_interrupt.o gr716_pwm.o gr716_gpio.o gr716_misc.o gr716_timestamp.o 
+OBJS_RELATIVE= bldc_commutate.o bldc_init.o bldc_interrupt.o gr716_pwm.o gr716_gpio.o gr716_misc.o gr716_timestamp.o gr716_spi.o gr716_sram.o gr716_adc.o gr716_io.o
 OBJS= $(addprefix $(DESTDIR)/,$(OBJS_RELATIVE))
 
 all: main.elf
@@ -29,6 +29,18 @@ $(DESTDIR)/gr716_gpio.o: gr716_gpio.c $(INCDIR)/gr716/gr716.h
 $(DESTDIR)/gr716_misc.o: gr716_misc.c $(INCDIR)/gr716/gr716_misc.h $(INCDIR)/gr716/gr716.h
 	$(CC) $(CFLAGS) -c gr716_misc.c -o $@
 
+$(DESTDIR)/gr716_spi.o: gr716_spi.c $(INCDIR)/gr716/gr716_spi.h $(INCDIR)/gr716/gr716.h
+	$(CC) $(CFLAGS) -c gr716_spi.c -o $@
+
+$(DESTDIR)/gr716_sram.o: gr716_sram.c $(INCDIR)/gr716/gr716_sram.h $(INCDIR)/gr716/gr716.h
+	$(CC) $(CFLAGS) -c gr716_sram.c -o $@
+
+$(DESTDIR)/gr716_adc.o: gr716_adc.c $(INCDIR)/gr716/gr716_adc.h $(INCDIR)/gr716/gr716.h
+	$(CC) $(CFLAGS) -c gr716_adc.c -o $@
+
+$(DESTDIR)/gr716_io.o: gr716_io.c $(INCDIR)/gr716/gr716_io.h $(INCDIR)/gr716/gr716.h
+	$(CC) $(CFLAGS) -c gr716_io.c -o $@
+
 main.elf: bldc_main.c $(OBJS)
 	$(CC) $(CFLAGS) bldc_main.c -o $(DESTDIR)/$@ $(OBJS)
 
@@ -36,4 +48,3 @@ main.elf: bldc_main.c $(OBJS)
 clean:
 	rm -f $(OBJS)
 
-#init.o interrupt.c src/gr716_pwm.c src/gr716_gpio.c src/gr716_misc.c src/gr716_spi.c src/gr716_sram.c | $(DESTDIR) 
