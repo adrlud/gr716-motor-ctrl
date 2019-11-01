@@ -178,14 +178,6 @@ struct grpwm_apb {
 #define PWM_DEAD_NONE         0x0
 #define PWM_DEAD_ENABLE       0x1
 
-/*
- * 
- * 
- *  
- * 
- * Clock gate and IO configuration registers
- * 
- */ 
 
 /*
  * PWM0 config
