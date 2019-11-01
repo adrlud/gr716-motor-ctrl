@@ -1,4 +1,4 @@
-#include "../include/gr716/gr716.h"
+#include <gr716/gr716.h>
 #include <stdio.h>
 uint32_t gr716_gpio_write(uint32_t pin, uint32_t value)
 {
@@ -81,10 +81,10 @@ uint32_t gr716_gpio_config(uint32_t pin, uint32_t direction, uint32_t mask, uint
       }
    } 
    return BCC_FAIL;
-}
+ }
+
 /*
- * 
- * This function change polarity for the edge uint32_tterupt.
+ * This function change polarity for the edge interupt.
  * i.e the gpio request an uint32_terrupt on either low to high flank or high to low flank.
  * If interrupt on both flanks is wanated, call this function after an uint32_terrupt to change flank. 
  */ 

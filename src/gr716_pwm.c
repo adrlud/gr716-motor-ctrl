@@ -48,7 +48,7 @@
 #define PAIRZ_MASK      0x1
 #define DCEN_BIT        8      // Dual compare mode enable
 #define DCEN_MASK       0x1
-#define WEN_BIT         9      // Waveform PWM enable (Shall be removed!)
+#define WEN_BIT         9      // Waveform PWM enable
 #define WEN_MASK        0x1
 #define SCALERSEL_BIT   10     //  Scaler select bits
 #define SCALERSEL_MASK  0x7
@@ -148,9 +148,6 @@ uint32_t gr716_pwm0_config(uint32_t nbr,
 
 /*
  * PWM0 Update
- *
- *
- * return: OK
  * 
  */
 
@@ -169,9 +166,6 @@ volatile struct grpwm_apb *pwmbase0 = (struct grpwm_apb *) (GRPWM0_BASE + (nbr *
 
 /*
  * PWM0 Init
- *
- *
- * return: OK
  * 
  */
 
@@ -197,9 +191,6 @@ uint32_t gr716_pwm0_init(uint32_t scaler)
 
 /*
  * PWM0 Global enable
- *
- *
- * return: OK
  * 
  */
 
@@ -233,9 +224,6 @@ uint32_t gr716_pwm0_global_disable(uint32_t mask)
 
 /*
  * PWM0 enable
- *
- *
- * return: OK
  * 
  */
 
@@ -254,9 +242,6 @@ uint32_t gr716_pwm0_enable(uint32_t nbr)
 
 /*
  * PWM0 disable
- *
- *
- * return: OK
  * 
  */
 
@@ -276,9 +261,6 @@ uint32_t gr716_pwm0_disable(uint32_t nbr)
 /*
  * PWM0 Clock enable
  *
- *
- * return: OK
- * 
  */
 
 uint32_t gr716_pwm0_clk_enable(void)
@@ -298,9 +280,6 @@ uint32_t gr716_pwm0_clk_enable(void)
 /*
  * PWM0 clock disable
  *
- *
- * return: BCC response
- * 
  */
 
 uint32_t gr716_pwm0_clk_disable(void)
