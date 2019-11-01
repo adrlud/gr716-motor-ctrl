@@ -14,6 +14,10 @@
 #ifndef __GR716_SRAM_H_
 #define __GR716_SRAM_H_
 
+
+
+
+
 /*
  * Enable clock for SRAM control unit 0
  *

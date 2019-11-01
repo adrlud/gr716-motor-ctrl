@@ -3,13 +3,8 @@
 int gr716_sram0_clock_enable(void) {
 
  // Clock gate and IO configuration registers
-  struct gckcfg_apb {
-   volatile unsigned int  unlock;
-   volatile unsigned int  clocken;
-   volatile unsigned int  reset;
-   volatile unsigned int  override;
-  };
 
+  
   struct  gckcfg_apb *gckcfgbase0 = (struct gckcfg_apb *) (GRCLKGATE0_BASE);
 
   gckcfgbase0->unlock  = REGSET(gckcfgbase0->unlock,  CG_FTMCTRL, CG_UNLOCK);

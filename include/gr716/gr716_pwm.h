@@ -178,6 +178,22 @@ struct grpwm_apb {
 #define PWM_DEAD_NONE         0x0
 #define PWM_DEAD_ENABLE       0x1
 
+/*
+ * 
+ * 
+ *  
+ * 
+ * Clock gate and IO configuration registers
+ * 
+ */ 
+
+/*
+ * PWM0 config
+ *
+ *
+ * return: OK
+ * 
+ */
 
 uint32_t gr716_pwm0_config(uint32_t nbr,
                                   uint32_t mode,  uint32_t meth,     uint32_t trigger, uint32_t scaler,
@@ -207,7 +223,23 @@ uint32_t gr716_pwm0_comp_update(uint32_t nbr, uint32_t comp1, uint32_t comp2);
 
 uint32_t gr716_pwm0_init(uint32_t scaler);
 
+/*
+ * PWM0 global enable
+ *
+ *
+ * return: OK
+ * 
+ */
+
 uint32_t gr716_pwm0_global_disable(uint32_t mask);
+
+/*
+ * PWM0 global disable
+ *
+ *
+ * return: OK
+ * 
+ */
 
 uint32_t gr716_pwm0_global_enable(uint32_t mask);
 

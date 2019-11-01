@@ -28,6 +28,7 @@
 #include "./gr716_pwm.h"
 #include "./gr716_dma.h"
 #include "./gr716_irqts.h"
+#include "./gr716_clock_gate.h"
 
 #ifndef __GR716_H_
 #define __GR716_H_

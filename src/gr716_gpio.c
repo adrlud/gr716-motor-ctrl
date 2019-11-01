@@ -2,15 +2,6 @@
 #include <stdio.h>
 uint32_t gr716_gpio_write(uint32_t pin, uint32_t value)
 {
-
-  struct grgpio_apb {
-  volatile unsigned int  data;         // 0x00       I/O Port Data Register
-  volatile unsigned int  output;       // 0x04       I/O Port Output Register
-  volatile unsigned int  direction;    // 0x08       I/O Port Direction Register 
-  volatile unsigned int  mask;         // 0x0C       I/O Port interrupt mask Register 
-  };
-      
-
    struct grgpio_apb *gpiobase0 = (struct grgpio_apb *) GPIO0_BASE;
    struct grgpio_apb *gpiobase1 = (struct grgpio_apb *) GPIO1_BASE;
 
@@ -32,12 +23,7 @@ uint32_t gr716_gpio_write(uint32_t pin, uint32_t value)
 int gr716_gpio_read(uint32_t pin)
 {
 
-  struct grgpio_apb {
-  volatile unsigned int  data;         // 0x00       I/O Port Data Register
-  volatile unsigned int  output;       // 0x04       I/O Port Output Register
-  volatile unsigned int  direction;    // 0x08       I/O Port Direction Register 
-  volatile unsigned int  mask;         // 0x0C       I/O Port interrupt mask Register
-  };
+
       
 
    struct grgpio_apb *gpiobase0 = (struct grgpio_apb *) GPIO0_BASE;

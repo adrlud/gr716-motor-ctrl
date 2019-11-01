@@ -283,16 +283,7 @@ uint32_t gr716_pwm0_disable(uint32_t nbr)
 
 uint32_t gr716_pwm0_clk_enable(void)
 {
-
-  // Clock gate and IO configuration registers
-  struct gckcfg_apb {
-   volatile unsigned int  unlock;
-   volatile unsigned int  clocken;
-   volatile unsigned int  reset;
-   volatile unsigned int  override;
-  };
-
-  // Pointers to clock gate block
+  // Pointer to clock gate block
   struct  gckcfg_apb *gckcfgbase0 = (struct gckcfg_apb *) (GRCLKGATE0_BASE);
     
   gckcfgbase0->unlock  = REGSET(gckcfgbase0->unlock,  CG_GRPWM0, CG_UNLOCK);
@@ -314,16 +305,7 @@ uint32_t gr716_pwm0_clk_enable(void)
 
 uint32_t gr716_pwm0_clk_disable(void)
 {
-
-  // Clock gate and IO configuration registers
-  struct gckcfg_apb {
-   volatile unsigned int  unlock;
-   volatile unsigned int  clocken;
-   volatile unsigned int  reset;
-   volatile unsigned int  override;
-  };
-
-  // Pointers to clock gate block
+  // Pointers t clock gate block
   struct  gckcfg_apb *gckcfgbase0 = (struct gckcfg_apb *) (GRCLKGATE0_BASE);
 
   gckcfgbase0->unlock  = REGSET(gckcfgbase0->unlock,  CG_GRPWM0, CG_UNLOCK);

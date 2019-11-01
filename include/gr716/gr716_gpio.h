@@ -18,18 +18,19 @@
  * pin   : Select pin [0 - 63]
  * value : 0 or 1
  *
- * return: BCC response
- * 
- * Todo: Add error checking
  * 
  */
 
+struct grgpio_apb {
+    volatile unsigned int  data;         // 0x00       I/O Port Data Register
+    volatile unsigned int  output;       // 0x04       I/O Port Output Register
+    volatile unsigned int  direction;    // 0x08       I/O Port Direction Register 
+    volatile unsigned int  mask;         // 0x0C       I/O Port interrupt mask Register 
+};
 
 uint32_t gr716_gpio_write(uint32_t pin, uint32_t value);
 
 int gr716_gpio_read(uint32_t pin);
-
-/* Adrians funktion */
 
 int gr716_gpio_find_irq_pin();
 
