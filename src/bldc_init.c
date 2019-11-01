@@ -15,36 +15,29 @@ const unsigned int __bsp_sysfreq = 50*1000*1000;
 #define PWM_CHANNEL_COUNT 6
 
 /*PWM channel config*/
-#define PWM0_NBR           0                          // Select PWM output [0 - 7]
-#define PWM1_NBR           1                          // Select PWM output [0 - 7]
-#define PWM2_NBR           2                          // Select PWM output [0 - 7]
-#define PWM3_NBR           3                          // Select PWM output [0 - 7]
-#define PWM4_NBR           4                          // Select PWM output [0 - 7]
-#define PWM5_NBR           5                          // Select PWM output [0 - 7]
-#define PWM0_MODE          PWM_MODE_ONECOMP           // Select PWM mode {OneCompMode, DualCompMode, ExtCompMode}
-#define PWM0_METH          PWM_MODE_ASYMMETRIC        // Select Asymmetric or symmetric method {Asymmetric, Symmetric}
-#define PWM0_PAIR          PWM_PAIR_NONE              // Pair mode {none, enable, zero}
-#define PWM0_POLARITY      PWM_POLARITY_LOW          // Select polarity {low, high}
-#define PWM3_POLARITY      PWM_POLARITY_LOW          // Select polarity {low, high}
-#define PWM0_FLIP          PWM_FLIP_NONE              // Output flip bit {none, flip}
-#define PWM0_DEADBAND      PWM_DEAD_NONE              // Enable deadband {none, deadband}
-#define PWM0_TRIGGER       PWM_TRIGGER_NONE           // Select trigger mode {none, enable}
-#define PWM0_IRQEN         PWM_IRQ_NONE               // Generate interrupt  {none, enable, comp}
-#define PWM0_SCALER        0                          // Set clock scaler scaler [0 - 7]
-#define PWM0_ISCALER       0                          // Set interrupt scaler scaler [0 - 7]
-#define PWM0_DSCALER       0                          // Set deadband scaler [0 - 7]
-#define PWM0_PERIOD        100                         // PWM period register [0 - 0xFFFF]
-#define PWM0_COMP1         0                         // COMP1 dead band compare register [0 - 0xFFFF]
-#define PWM3_COMP1         0                           // comp1 low polarity = unmodulasted pwm 
-#define PWM0_COMP2         0x0                        // COMP2 dead band compare register [0 - 0xFFFF]
-#define PWM0_DBCOMP        0x0                        // PWM dead band compare register [0 - 0xFF]
-
-
-
-
- 
-
-
+#define PWM0_NBR           0                          
+#define PWM1_NBR           1                          
+#define PWM2_NBR           2
+#define PWM3_NBR           3             
+#define PWM4_NBR           4                        
+#define PWM5_NBR           5                        
+#define PWM0_MODE          PWM_MODE_ONECOMP        
+#define PWM0_METH          PWM_MODE_ASYMMETRIC       
+#define PWM0_PAIR          PWM_PAIR_NONE            
+#define PWM0_POLARITY      PWM_POLARITY_LOW        
+#define PWM3_POLARITY      PWM_POLARITY_LOW       
+#define PWM0_FLIP          PWM_FLIP_NONE    
+#define PWM0_DEADBAND      PWM_DEAD_NONE            
+#define PWM0_TRIGGER       PWM_TRIGGER_NONE          
+#define PWM0_IRQEN         PWM_IRQ_NONE              
+#define PWM0_SCALER        0                         
+#define PWM0_ISCALER       0                          
+#define PWM0_DSCALER       0                        
+#define PWM0_PERIOD        100                         
+#define PWM0_COMP1         0                    
+#define PWM3_COMP1         0                           
+#define PWM0_COMP2         0x0                      
+#define PWM0_DBCOMP        0x0                        
 
 
 void PWM_init(){
@@ -121,9 +114,7 @@ void PWM_init(){
 
 void GPIO_init(){
     /* Setup polarity on edge interrupt according to current state of hall to enable interrupt on change from the get go */
-    /*The GPIO doesnt support interrupt on both rising and falling edge at the same time*/
-    /* this function sets intterupt on each pin to either rising or falling edge acoording to the current state*/
-
+    /* The GPIO doesnt support interrupt on both rising and falling edge at the same time*/
 
     /*Configure hall sensors input pins to make them readable*/
     gr716_gpio_config(HALL_A, GPIO_DIR, GPIO_IRQ, GPIO_POL, GPIO_EDGE, GPIO_INPUT_ENABLE);
@@ -159,7 +150,7 @@ void GPIO_init(){
 }
 
 void interrupt_init(){
-    /*Remap gpio1 intterrupt vector*/
+    /*Remap gpio1 interrupt vector*/
     bcc_int_map_set(38, 18);
     bcc_isr_register(18, interrupt_handler, NULL);
     bcc_int_unmask(18);

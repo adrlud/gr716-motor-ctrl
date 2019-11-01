@@ -1,5 +1,7 @@
 #include <gr716/gr716.h>
 
+/* Set function in io mux*/
+
 uint32_t gr716_pinfunc(int pin, int mode)
 {
 
@@ -40,8 +42,6 @@ uint32_t gr716_pinfunc(int pin, int mode)
 /*
  * Enable Direction and Mode function per pin
  *
- * pin  : Select pin [0 - 63]
- * mode : Select mode
  * 
  */
 

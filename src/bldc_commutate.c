@@ -3,7 +3,7 @@
 
 
 void commutate(){
-    
+    /*Shift phases*/
     unsigned char hall = ((gr716_gpio_read(40)<<0) | (gr716_gpio_read(41)<<1) | (gr716_gpio_read(42)<<2));
 
     switch(hall){
