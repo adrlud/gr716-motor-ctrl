@@ -6,7 +6,7 @@
 #include <bcc/bcc_param.h>
 
 
-/*system clock 5 Mhz*/
+/*system clock 50 Mhz*/
 const unsigned int __bsp_sysfreq = 50*1000*1000;
 
 /*Global config*/
@@ -34,10 +34,74 @@ const unsigned int __bsp_sysfreq = 50*1000*1000;
 #define PWM0_ISCALER       0                          
 #define PWM0_DSCALER       0                        
 #define PWM0_PERIOD        100                         
-#define PWM0_COMP1         0                    
+#define PWM0_COMP1         40                    
 #define PWM3_COMP1         0                           
 #define PWM0_COMP2         0x0                      
-#define PWM0_DBCOMP        0x0                        
+#define PWM0_DBCOMP        0x0    
+
+#define TEST_ADC_NBR            0                   // ADC unit [0 - 7] 
+#define TEST_ADC_CHANNEL        0                   // Channel {[0-7], ADC_CHANNEL_TEMP, ADC_CHANNEL_VOLT}
+#define TEST_ADC_MODE_SEQ_CONT  ADC_MODE_SEQ_CONT   // Mode (ADC_MODE_SINGLE,ADC_MODE_SEQ,ADC_MODE_SEQ_CONT)
+#define TEST_ADC_INMODE_SINGLE  ADC_INMODE_SINGLE   // INput mode (ADC_INMODE_DIFF, ADC_INMODE_SINGLE)
+#define TEST_ADC_SAMPLES        0                   // Use 0 consecutive samples
+#define TEST_ADC_EVENTS         1                   // Over events...
+#define TEST_ADC_TRIGGER_ENABLE ADC_TRIGGER_ENABLE  // Enable trigger (ADC_TRIGGER_ENABLE, ADC_TRIGGER_NONE)
+#define TEST_ADC_TRIGGER_SOURCE ADC_TRIG_TIM1_CNT1  // Enable sync source from Timer1 counter 1 
+#define TEST_ADC_IRQ_AUTO       ADC_IRQ_AUTO        // Enable IRQ (ADC_IRQ_NONE, ADC_IRQ_ENABLE, ADC_IRQ_AUTO)
+#define TEST_ADC_BYPASS_ENABLE  ADC_BYPASS_ENABLE   // Bypass (ADC_BYPASS_NONE, ADC_BYPASS_ENABLE)
+#define TEST_ADC_GAIN_0db       ADC_GAIN_0db        // Gain (ADC_GAIN_0db, ADC_GAIN_6db, ADC_GAIN_12db)
+#define TEST_ADC_RATE_KHZ       200*1000            // Sample rate (1000Hz - 3000000Hz)
+#define TEST_ADC_SEQ_RATE       1*1000              // Sequence (1 - 65535 Msps) rate if no sync source is selected
+#define TEST_ADC_FREQ_KHZ       50*1000*1000        // System clock frequency (1Mhz - 50MHz)
+
+/* Define number of sucessful ADC transfers to perform in test */
+#define TEST_ADC_TRANS 4
+
+/* Define ADC transfer interrupt in test */
+#define TEST_ADC_IRQ 7
+
+// Store of data in local RAM
+
+
+/* Test Init */
+int adc_test_init(){
+
+  /* Enable and clear Brown Outs */
+  //gr716_bo_enable_all();
+  
+  /* Enable Clocks */
+  int ret_adc_clk;
+  ret_adc_clk = gr716_adc_clk_enable(TEST_ADC_NBR);
+  
+  /* Setup IO MUX for selected ADC */
+  // Enable:
+  //   - ADC 0 -> Pin #37 (SYS.CFG.GP4.GP5)
+  // ADC pin is related to external ADC channel and NOT ADC unit
+  int adc_io_pin;
+  int adc_io_diff_pin;
+  adc_io_pin = 37 + TEST_ADC_CHANNEL;
+  adc_io_diff_pin = 37 + TEST_ADC_CHANNEL + 1;
+  int ret_io;
+  ret_io = gr716_pinfunc(adc_io_pin,IO_MODE_ADC);
+  if ((TEST_ADC_INMODE_SINGLE == ADC_INMODE_DIFF) && (ret_io == BCC_OK)) {
+    ret_io = gr716_pinfunc(adc_io_diff_pin,IO_MODE_ADC);
+  } else if ((TEST_ADC_INMODE_SINGLE == ADC_INMODE_DIFF) && (ret_io != BCC_OK)) {
+    printf("Not able to to set diff pair inputs for ADC \n");
+  }
+
+  /* ADC Init */
+  int ret_adc;
+  ret_adc = gr716_adc_channel_enable(TEST_ADC_NBR,
+                                     TEST_ADC_CHANNEL, TEST_ADC_MODE_SEQ_CONT, TEST_ADC_INMODE_SINGLE,
+                                     TEST_ADC_SAMPLES, TEST_ADC_EVENTS,
+                                     TEST_ADC_TRIGGER_ENABLE, TEST_ADC_TRIGGER_SOURCE, TEST_ADC_IRQ_AUTO,
+                                     TEST_ADC_BYPASS_ENABLE, TEST_ADC_GAIN_0db,
+                                     TEST_ADC_RATE_KHZ, TEST_ADC_SEQ_RATE, TEST_ADC_FREQ_KHZ);
+
+  return (ret_adc | ret_io | ret_adc_clk);
+}
+
+
 
 
 void PWM_init(){

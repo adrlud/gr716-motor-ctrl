@@ -1,7 +1,7 @@
 PREFIX=sparc-gaisler-elf-
 CC = $(PREFIX)gcc
 INCDIR=../include
-CFLAGS = -g -O3 -qbsp=gr716 -I$(INCDIR)
+CFLAGS = -g -O3  -qbsp=gr716 -mcpu=leon3 -I$(INCDIR) 
 DESTDIR = ../bin
 OBJS_RELATIVE= bldc_commutate.o bldc_init.o bldc_interrupt.o gr716_pwm.o gr716_gpio.o gr716_misc.o gr716_timestamp.o gr716_spi.o gr716_sram.o gr716_adc.o gr716_io.o
 OBJS= $(addprefix $(DESTDIR)/,$(OBJS_RELATIVE))
@@ -42,8 +42,7 @@ $(DESTDIR)/gr716_io.o: gr716_io.c $(INCDIR)/gr716/gr716_io.h $(INCDIR)/gr716/gr7
 	$(CC) $(CFLAGS) -c gr716_io.c -o $@
 
 main.elf: bldc_main.c $(OBJS)
-	$(CC) $(CFLAGS) bldc_main.c -o $(DESTDIR)/$@ $(OBJS)
-
+	$(CC) $(CFLAGS) bldc_main.c /opt/bcc-2.0.8-rc.3-gdb8-gcc/sparc-gaisler-elf/lib/libdrv.a -o $(DESTDIR)/$@ $(OBJS) 
 
 clean:
 	rm -f $(OBJS)

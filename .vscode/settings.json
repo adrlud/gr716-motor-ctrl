@@ -8,6 +8,9 @@
         "stdio.h": "c",
         "stdlib.h": "c",
         "bcc.h": "c",
-        "gr716_irqts.h": "c"
+        "gr716_irqts.h": "c",
+        "timer.h": "c",
+        "spi.h": "c",
+        "gptimer-regs.h": "c"
     }
 }

@@ -4,5 +4,6 @@
 #include <gr716/gr716.h>
 
 void BLDC_start_motor();
+int adc_test_init();
 
 #endif
